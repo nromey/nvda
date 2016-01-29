@@ -9,7 +9,7 @@ environment:
  PY_PYTHON: 2.7-32
 
 init:
-  - ps: |-
+  - ps: |
     If ($env:APPVEYOR_REPO_TAG -eq "true") {
      # TODO: Set release version.
      Set-AppveyorBuildVariable "release" "1"
@@ -18,7 +18,7 @@ init:
      Update-AppveyorBuild -Version $version
      Set-AppveyorBuildVariable "release" "0"
     }
-   -
+  -
 
 install:
  - git submodule update --init
