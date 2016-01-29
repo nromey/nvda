@@ -1,4 +1,4 @@
-version: "{build}"
+version: {branch}-{build}
 
 branches:
  only:
@@ -9,11 +9,9 @@ environment:
  PY_PYTHON: 2.7-32
  enc_file_key:
   secure: ekOvuyywHuDdGZmRmoj+b3jfrq39A2xlx4RD5ZUGd/8=
+ symstore: 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe'
 
 init:
- - cd \
- - dir /s /b symstore.exe
- - zigzagzog
  - ps: |
      If ($env:APPVEYOR_REPO_TAG -eq "true") {
       # TODO: Set release version.
@@ -38,7 +36,12 @@ install:
  - git submodule update --init
 
 build_script:
- - py scons.py launcher version=%APPVEYOR_BUILD_VERSION% release=%release% publisher="NV Access Limited" certFile=appveyor\authenticode.pfx certTimestampServer=http://timestamp.digicert.com
+ - py scons.py launcher version=%APPVEYOR_BUILD_VERSION% release=%release% publisher="NV Access" certFile=appveyor\authenticode.pfx certTimestampServer=http://timestamp.digicert.com
+ # Build symbol store.
+ - for %p in (source\*.pdb source\lib\*.pdb source\lib64\*.pdb source\synthDrivers\*.pdb) do "%symstore%" add 	/s symbols /compress -:NOREFS /t NVDA /f %p
+ - cd symbols
+ - 7z a -tzip -r ..\output\symbols.zip *.pd_
+ - cd ..
 
 artifacts:
  - path: output\*
