@@ -11,6 +11,9 @@ environment:
   secure: ekOvuyywHuDdGZmRmoj+b3jfrq39A2xlx4RD5ZUGd/8=
 
 init:
+ - cd \
+ - dir /s /b symstore.exe
+ - zigzagzog
  - ps: |
      If ($env:APPVEYOR_REPO_TAG -eq "true") {
       # TODO: Set release version.
@@ -31,8 +34,6 @@ install:
  # Install ssh stuff.
  - copy ssh_id_rsa %userprofile%\.ssh\id_rsa
  - type ssh_known_hosts >> %userprofile%\.ssh\known_hosts
- - echo hi | ssh nvaccess@exbi.nvaccess.org foobar
- - asdf
  - cd ..
  - git submodule update --init
 
