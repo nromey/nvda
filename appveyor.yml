@@ -10,15 +10,15 @@ environment:
 
 init:
   - ps: |
-    If ($env:APPVEYOR_REPO_TAG -eq "true") {
-     # TODO: Set release version.
-     Set-AppveyorBuildVariable "release" "1"
-    } else {
-     $version = "$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 7)
-     Update-AppveyorBuild -Version $version
-     Set-AppveyorBuildVariable "release" "0"
-    }
-  -
+      If ($env:APPVEYOR_REPO_TAG -eq "true") {
+       # TODO: Set release version.
+       Set-AppveyorBuildVariable "release" "1"
+      } else {
+       $version = "$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 7)
+       Update-AppveyorBuild -Version $version
+       Set-AppveyorBuildVariable "release" "0"
+      }
+    -
 
 install:
  - git submodule update --init
