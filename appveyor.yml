@@ -28,8 +28,11 @@ install:
  # Decrypt files.
  - openssl enc -aes-256-cbc -d -pass pass:%enc_file_key% -in authenticode.pfx.enc -out authenticode.pfx
  - openssl enc -aes-256-cbc -d -pass pass:%enc_file_key% -in ssh_id_rsa.enc -out ssh_id_rsa
- # Install ssh private key.
+ # Install ssh stuff.
  - copy ssh_id_rsa %userprofile%\.ssh\id_rsa
+ - type ssh_known_hosts >> %userprofile%\.ssh\known_hosts
+ - echo hi | ssh nvaccess@exbi.nvaccess.org foobar
+ - asdf
  - cd ..
  - git submodule update --init
 
