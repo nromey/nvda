@@ -31,7 +31,7 @@ install:
  # Install ssh private key.
  - copy ssh_id_rsa %userprofile%\.ssh\id_rsa
  - cd ..
- - git submodule update --init --depth 1
+ - git submodule update --init
 
 build_script:
  - py scons.py launcher version=%APPVEYOR_BUILD_VERSION% release=%release% publisher="NV Access Limited" certFile=appveyor\authenticode.pfx certTimestampServer=http://timestamp.digicert.com
