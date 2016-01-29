@@ -11,7 +11,7 @@ install:
  - git submodule update --init
 
 build_script:
- - py scons.py launcher version=%APPVEYOR_BUILD_VERSION% publisher=\"NV Access Limited\"
+ - py scons.py launcher version=%APPVEYOR_BUILD_VERSION% publisher="NV Access Limited"
 
 artifacts:
  - path: output\*
