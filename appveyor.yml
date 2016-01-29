@@ -9,9 +9,11 @@ environment:
  PY_PYTHON: 2.7-32
  enc_file_key:
   secure: ekOvuyywHuDdGZmRmoj+b3jfrq39A2xlx4RD5ZUGd/8=
- symstore: 'C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe'
+ symstore: C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe
 
 init:
+ - for %f in (a b c) do echo "%symstore%" add /s -:NOREFS %f
+ - asdf
  - ps: |
      If ($env:APPVEYOR_REPO_TAG -eq "true") {
       # TODO: Set release version.
