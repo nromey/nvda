@@ -47,4 +47,4 @@ artifacts:
  - path: output\*
 
 deploy_script:
- - ps: $artifacts.keys | Foreach-Object { $artifacts[$_]["url"] } | ssh nvaccess@exbi.nvaccess.org appveyorDeploy
+ - ps: ConvertTo-Json -InputObject $artifacts -Compress | ssh nvaccess@exbi.nvaccess.org nvdaAppveyorDeploy
