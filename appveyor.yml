@@ -53,7 +53,7 @@ build_script:
      }
      $sconsArgs += "publisher=NV Access"
      $sconsArgs += "certFile=appveyor\authenticode.pfx", "certTimestampServer=http://timestamp.digicert.com"
- - ps: Write-Host (("scons args: " + ($sconsArgs -join ", "))
+     Write-Host (("scons args: " + ($sconsArgs -join ", "))
  - py scons.py $sconsArgs
  # Build symbol store.
  - |
