@@ -13,14 +13,14 @@ environment:
 
 init:
  - ps: |
-     If ($env:APPVEYOR_REPO_TAG -eq "true") {
-      # TODO: Set release version.
+     if ($env:APPVEYOR_REPO_TAG_NAME -and $env:APPVEYOR_REPO_TAG_NAME.StartsWith("release-")) {
+      # Strip "release-" prefix.
+      $version = $$env:APPVEYOR_REPO_TAG_NAME.Substring(8)
       Set-AppveyorBuildVariable "release" "1"
      } else {
       $version = "$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8)
-      Update-AppveyorBuild -Version $version
-      Set-AppveyorBuildVariable "release" "0"
      }
+     Update-AppveyorBuild -Version $version
 
 clone_depth: 1
 
@@ -36,9 +36,30 @@ install:
  - git submodule update --init
 
 build_script:
- - py scons.py launcher version=%APPVEYOR_BUILD_VERSION% release=%release% publisher="NV Access" certFile=appveyor\authenticode.pfx certTimestampServer=http://timestamp.digicert.com
+ - ps: |
+     $sconsArgs = "launcher", "version=$env:APPVEYOR_BUILD_VERSION"
+     if ($env:release) {
+      $sconsArgs += "changes", "userGuide", "developerGuide", "release=1"
+      if ($env:APPVEYOR_REPO_TAG_NAME.Contains("rc")) {
+       $updateType = "beta"
+      } else {
+       $updateType = "stable"
+      }
+     } elseif (!$env:APPVEYOR_REPO_BRANCH.StartsWith("try-")) {
+      $updateType = "snapshot:$env:APPVEYOR_REPO_BRANCH"
+     }
+     if ($updateType) {
+      $sconsArgs += $updateType
+     }
+     $sconsArgs += "publisher=NV Access"
+     $sconsArgs += "certFile=appveyor\authenticode.pfx", "certTimestampServer=http://timestamp.digicert.com"
+ - Write-Host (("scons args: " + ($sconsArgs -join ", "))
+ - py scons.py $sconsArgs
  # Build symbol store.
- - for %%p in (source\*.pdb source\lib\*.pdb source\lib64\*.pdb source\synthDrivers\*.pdb) do "%symstore%" add /s symbols /compress -:NOREFS /t NVDA /f %%p
+ - |
+     foreach ($syms in "source\*.pdb", "source\lib\*.pdb", "source\lib64\*.pdb", "source\synthDrivers\*.pdb") {
+      & $symstore add /s symbols /compress -:NOREFS /t NVDA /f $syms
+     }
  - cd symbols
  - 7z a -tzip -r ..\output\symbols.zip *.pd_
  - cd ..
