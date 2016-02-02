@@ -54,9 +54,9 @@ build_script:
      $sconsArgs += "publisher=NV Access"
      $sconsArgs += "certFile=appveyor\authenticode.pfx", "certTimestampServer=http://timestamp.digicert.com"
      Write-Host ("scons args: " + ($sconsArgs -join ", "))
- - py scons.py $sconsArgs
+ - ps: py scons.py $sconsArgs
  # Build symbol store.
- - |
+ - ps: |
      foreach ($syms in "source\*.pdb", "source\lib\*.pdb", "source\lib64\*.pdb", "source\synthDrivers\*.pdb") {
       & $symstore add /s symbols /compress -:NOREFS /t NVDA /f $syms
      }
