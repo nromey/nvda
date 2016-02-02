@@ -54,7 +54,7 @@ build_script:
      $sconsArgs += ' publisher="NV Access"'
      $sconsArgs += " certFile=appveyor\authenticode.pfx certTimestampServer=http://timestamp.digicert.com"
      Set-AppveyorBuildVariable "sconsArgs" $sconsArgs
- - echo scons args: %sconsArgs%
+ - 'echo scons args: %sconsArgs%'
  - py scons.py %sconsArgs%
  # Build symbol store.
  - ps: |
