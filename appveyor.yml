@@ -7,7 +7,7 @@ branches:
 
 environment:
  PY_PYTHON: 2.7-32
- enc_file_key:
+ encFileKey:
   secure: ekOvuyywHuDdGZmRmoj+b3jfrq39A2xlx4RD5ZUGd/8=
  symstore: C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore.exe
 
@@ -27,8 +27,8 @@ clone_depth: 1
 install:
  - cd appveyor
  # Decrypt files.
- - openssl enc -aes-256-cbc -d -pass pass:%enc_file_key% -in authenticode.pfx.enc -out authenticode.pfx
- - openssl enc -aes-256-cbc -d -pass pass:%enc_file_key% -in ssh_id_rsa.enc -out ssh_id_rsa
+ - openssl enc -aes-256-cbc -d -pass pass:%encFileKey% -in authenticode.pfx.enc -out authenticode.pfx
+ - openssl enc -aes-256-cbc -d -pass pass:%encFileKey% -in ssh_id_rsa.enc -out ssh_id_rsa
  # Install ssh stuff.
  - copy ssh_id_rsa %userprofile%\.ssh\id_rsa
  - type ssh_known_hosts >> %userprofile%\.ssh\known_hosts
@@ -37,9 +37,9 @@ install:
 
 build_script:
  - ps: |
-     $sconsArgs = "launcher", "version=$env:APPVEYOR_BUILD_VERSION"
+     $sconsArgs = "launcher version=$env:APPVEYOR_BUILD_VERSION"
      if ($env:release) {
-      $sconsArgs += "changes", "userGuide", "developerGuide", "release=1"
+      $sconsArgs += " changes userGuide developerGuide release=1"
       if ($env:APPVEYOR_REPO_TAG_NAME.Contains("rc")) {
        $updateType = "beta"
       } else {
@@ -49,12 +49,13 @@ build_script:
       $updateType = "snapshot:$env:APPVEYOR_REPO_BRANCH"
      }
      if ($updateType) {
-      $sconsArgs += "updateVersionType=$updateType"
+      $sconsArgs += " updateVersionType=$updateType"
      }
-     $sconsArgs += "publisher=NV Access"
-     $sconsArgs += "certFile=appveyor\authenticode.pfx", "certTimestampServer=http://timestamp.digicert.com"
-     Write-Host ("scons args: " + ($sconsArgs -join ", "))
- - ps: py scons.py $sconsArgs
+     $sconsArgs += ' publisher="NV Access"'
+     $sconsArgs += " certFile=appveyor\authenticode.pfx certTimestampServer=http://timestamp.digicert.com"
+     Set-AppveyorBuildVariable "sconsArgs" $sconsArgs
+ - echo scons args: %sconsArgs%
+ - py scons.py %sconsArgs%
  # Build symbol store.
  - ps: |
      foreach ($syms in "source\*.pdb", "source\lib\*.pdb", "source\lib64\*.pdb", "source\synthDrivers\*.pdb") {
