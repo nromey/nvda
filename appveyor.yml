@@ -49,7 +49,7 @@ build_script:
       $updateType = "snapshot:$env:APPVEYOR_REPO_BRANCH"
      }
      if ($updateType) {
-      $sconsArgs += $updateType
+      $sconsArgs += "updateVersionType=$updateType"
      }
      $sconsArgs += "publisher=NV Access"
      $sconsArgs += "certFile=appveyor\authenticode.pfx", "certTimestampServer=http://timestamp.digicert.com"
