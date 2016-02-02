@@ -59,7 +59,7 @@ build_script:
  # Build symbol store.
  - ps: |
      foreach ($syms in "source\*.pdb", "source\lib\*.pdb", "source\lib64\*.pdb", "source\synthDrivers\*.pdb") {
-      & $symstore add /s symbols /compress -:NOREFS /t NVDA /f $syms
+      & $env:symstore add /s symbols /compress -:NOREFS /t NVDA /f $syms
      }
  - cd symbols
  - 7z a -tzip -r ..\output\symbols.zip *.pd_
