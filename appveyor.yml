@@ -79,10 +79,10 @@ deploy_script:
       $exe = Get-ChildItem -Name output\*.exe
       $hash = (Get-FileHash $exe -Algorithm SHA1).Hash
       $data = @{
-       jobId=$env:APPVEYOR_JOB_ID,
-       version=$env:APPVEYOR_BUILD_VERSION, versionType=$env:versionType,
-       branch=$env:APPVEYOR_REPO_BRANCH,
-       exe=$exe, hash=$hash,
+       jobId=$env:APPVEYOR_JOB_ID;
+       version=$env:APPVEYOR_BUILD_VERSION; versionType=$env:versionType;
+       branch=$env:APPVEYOR_REPO_BRANCH;
+       exe=$exe; hash=$hash;
        artifacts=$artifacts
       }
       ConvertTo-Json -InputObject $data -Compress | ssh nvaccess@exbi.nvaccess.org nvdaAppveyorHook
