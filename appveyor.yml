@@ -77,9 +77,10 @@ deploy_script:
      if ($env:versionType) {
       # Not a try build.
       $exe = Get-ChildItem -Name output\*.exe
-      $hash = (Get-FileHash $exe -Algorithm SHA1).Hash
+      $hash = (Get-FileHash "output\$exe" -Algorithm SHA1).Hash
       $data = @{
        jobId=$env:APPVEYOR_JOB_ID;
+       commit=$env:APPVEYOR_REPO_COMMIT;
        version=$env:APPVEYOR_BUILD_VERSION; versionType=$env:versionType;
        branch=$env:APPVEYOR_REPO_BRANCH;
        exe=$exe; hash=$hash;
