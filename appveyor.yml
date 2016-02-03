@@ -17,10 +17,19 @@ init:
       # Strip "release-" prefix.
       $version = $env:APPVEYOR_REPO_TAG_NAME.Substring(8)
       Set-AppveyorBuildVariable "release" "1"
+      if ($env:APPVEYOR_REPO_TAG_NAME.Contains("rc")) {
+       $versionType = "beta"
+      } else {
+       $versionType = "stable"
+      }
      } else {
       $version = "$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8)
+      if (!$env:APPVEYOR_REPO_BRANCH.StartsWith("try-")) {
+       $versionType = "snapshot:$env:APPVEYOR_REPO_BRANCH"
+      }
      }
      Update-AppveyorBuild -Version $version
+     Set-AppveyorBuildVariable "versionType" $versionType
 
 clone_depth: 1
 
@@ -40,19 +49,14 @@ build_script:
      $sconsArgs = "launcher version=$env:APPVEYOR_BUILD_VERSION"
      if ($env:release) {
       $sconsArgs += " changes userGuide developerGuide release=1"
-      if ($env:APPVEYOR_REPO_TAG_NAME.Contains("rc")) {
-       $updateType = "beta"
-      } else {
-       $updateType = "stable"
-      }
-     } elseif (!$env:APPVEYOR_REPO_BRANCH.StartsWith("try-")) {
-      $updateType = "snapshot:$env:APPVEYOR_REPO_BRANCH"
      }
-     if ($updateType) {
-      $sconsArgs += " updateVersionType=$updateType"
+     if ($env:versionType) {
+      $sconsArgs += " updateVersionType=$env:versionType"
      }
      $sconsArgs += ' publisher="NV Access"'
      $sconsArgs += " certFile=appveyor\authenticode.pfx certTimestampServer=http://timestamp.digicert.com"
+     # We use cmd to run scons because PowerShell throws exceptions if warnings get dumped to stderr.
+     # It's possible to work around this, but the workarounds have annoying side effects.
      Set-AppveyorBuildVariable "sconsArgs" $sconsArgs
  - 'echo scons args: %sconsArgs%'
  - py scons.py %sconsArgs%
@@ -69,4 +73,17 @@ artifacts:
  - path: output\*
 
 deploy_script:
- - ps: ConvertTo-Json -InputObject $artifacts -Compress | ssh nvaccess@exbi.nvaccess.org nvdaAppveyorDeploy
+ - ps: |
+     if ($env:versionType) {
+      # Not a try build.
+      $exe = Get-ChildItem -Name output\*.exe
+      $hash = (Get-FileHash $exe -Algorithm SHA1).Hash
+      $data = @{
+       jobId=$env:APPVEYOR_JOB_ID,
+       version=$env:APPVEYOR_BUILD_VERSION, versionType=$env:versionType,
+       branch=$env:APPVEYOR_REPO_BRANCH,
+       exe=$exe, hash=$hash,
+       artifacts=$artifacts
+      }
+      ConvertTo-Json -InputObject $data -Compress | ssh nvaccess@exbi.nvaccess.org nvdaAppveyorHook
+     }
