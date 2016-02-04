@@ -4,6 +4,7 @@ branches:
  only:
   - i5499
   - /try-.*/
+  - /release-.*/
 
 environment:
  PY_PYTHON: 2.7-32
