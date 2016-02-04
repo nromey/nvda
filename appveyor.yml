@@ -75,6 +75,7 @@ build_script:
 
 artifacts:
  - path: output\*
+ - path: output\*\*
 
 deploy_script:
  - ps: |
