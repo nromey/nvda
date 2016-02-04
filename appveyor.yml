@@ -4,6 +4,7 @@ branches:
  only:
   - i5499
   - /try-.*/
+  # For tags, branch = tag if GitHub couldn't work out the base branch.
   - /release-.*/
 
 environment:
@@ -25,11 +26,13 @@ init:
       }
      } else {
       $version = "$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8)
+      # The version is unique even for rebuilds, so we can use it for the AppVeyor version.
+      Update-AppveyorBuild -Version $version
       if (!$env:APPVEYOR_REPO_BRANCH.StartsWith("try-")) {
        $versionType = "snapshot:$env:APPVEYOR_REPO_BRANCH"
       }
      }
-     Update-AppveyorBuild -Version $version
+     Set-AppveyorBuildVariable "version" $version
      Set-AppveyorBuildVariable "versionType" $versionType
 
 clone_depth: 1
@@ -47,7 +50,7 @@ install:
 
 build_script:
  - ps: |
-     $sconsArgs = "launcher version=$env:APPVEYOR_BUILD_VERSION"
+     $sconsArgs = "launcher version=$env:version"
      if ($env:release) {
       $sconsArgs += " changes userGuide developerGuide release=1"
      }
@@ -82,7 +85,8 @@ deploy_script:
       $data = @{
        jobId=$env:APPVEYOR_JOB_ID;
        commit=$env:APPVEYOR_REPO_COMMIT;
-       version=$env:APPVEYOR_BUILD_VERSION; versionType=$env:versionType;
+       version=$env:version; versionType=$env:versionType;
+       avVersion=$env:APPVEYOR_BUILD_VERSION;
        branch=$env:APPVEYOR_REPO_BRANCH;
        exe=$exe; hash=$hash;
        artifacts=$artifacts
