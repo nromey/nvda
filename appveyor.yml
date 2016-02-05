@@ -33,7 +33,9 @@ init:
       }
      }
      Set-AppveyorBuildVariable "version" $version
-     Set-AppveyorBuildVariable "versionType" $versionType
+     if ($versionType) {
+      Set-AppveyorBuildVariable "versionType" $versionType
+     }
 
 clone_depth: 1
 
