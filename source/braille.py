@@ -475,13 +475,16 @@ class Region(object):
 		if config.conf["braille"]["expandAtCursor"] and self.cursorPos is not None:
 			mode |= louis.compbrlAtCursor
 		text=unicode(self.rawText).replace('\0','')
+		table = [os.path.join(TABLES_DIR, config.conf["braille"]["translationTable"]),
+			"braille-patterns.cti"]
+		# liblouis mutates typeform if it is a list.
+		typeform = tuple(self.rawTextTypeforms) if isinstance(self.rawTextTypeforms, list) else self.rawTextTypeforms
+		cursorPos = self.cursorPos or 0
+		log.debugWarning("louis.translate({table!r}, {text!r}, typeform={typeform!r}, mode={mode!r}, cursorPos={cursorPos!r})".format(
+			table=table, text=text, typeform=typeform, mode=mode, cursorPos=cursorPos))
 		braille, self.brailleToRawPos, self.rawToBraillePos, brailleCursorPos = louis.translate(
-			[os.path.join(TABLES_DIR, config.conf["braille"]["translationTable"]),
-				"braille-patterns.cti"],
-			text,
-			# liblouis mutates typeform if it is a list.
-			typeform=tuple(self.rawTextTypeforms) if isinstance(self.rawTextTypeforms, list) else self.rawTextTypeforms,
-			mode=mode, cursorPos=self.cursorPos or 0)
+			table, text, typeform=typeform,
+			mode=mode, cursorPos=cursorPos)
 		# liblouis gives us back a character string of cells, so convert it to a list of ints.
 		# For some reason, the highest bit is set, so only grab the lower 8 bits.
 		self.brailleCells = [ord(cell) & 255 for cell in braille]
