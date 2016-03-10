@@ -219,8 +219,6 @@ void winword_expandToLine_helper(HWND hwnd, winword_expandToLine_args* args) {
 		LOG_DEBUGWARNING(L"selection.range failed");
 		return;
 	}
-	//Disable screen updating as we will be moving the selection temporarily
-	_com_dispatch_raw_propput(pDispatchApplication,wdDISPID_APPLICATION_SCREENUPDATING,VT_BOOL,false);
 	//Move the selection to the given range
 	_com_dispatch_raw_method(pDispatchSelection,wdDISPID_SELECTION_SETRANGE,DISPATCH_METHOD,VT_EMPTY,NULL,L"\x0003\x0003",args->offset,args->offset);
 	//Expand the selection to the line
@@ -255,8 +253,6 @@ void winword_expandToLine_helper(HWND hwnd, winword_expandToLine_args* args) {
 	_com_dispatch_raw_method(pDispatchOldSelRange,wdDISPID_RANGE_SELECT,DISPATCH_METHOD,VT_EMPTY,NULL,NULL);
 	//Restore the old selection direction
 	_com_dispatch_raw_propput(pDispatchSelection,wdDISPID_SELECTION_STARTISACTIVE,VT_BOOL,startWasActive);
-	//Reenable screen updating
-	_com_dispatch_raw_propput(pDispatchApplication,wdDISPID_APPLICATION_SCREENUPDATING,VT_BOOL,true);
 }
 
 BOOL generateFormFieldXML(IDispatch* pDispatchRange, wostringstream& XMLStream, int& chunkEnd) {
