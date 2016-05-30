@@ -3,7 +3,7 @@
 #A part of NonVisual Desktop Access (NVDA)
 #This file is covered by the GNU General Public License.
 #See the file COPYING for more details.
-#Copyright (C) 2010-2015 NV Access Limited
+#Copyright (C) 2010-2016 NV Access Limited
 
 import time
 from collections import OrderedDict
@@ -87,6 +87,7 @@ USB_IDS_HID = {
 	"VID_0904&PID_4005", # Pronto! 40 V3
 	"VID_0904&PID_4007", # Pronto! 18 V4
 	"VID_0904&PID_4008", # Pronto! 40 V4
+	"VID_0483&PID_A1D3", # Orbit Reader 20
 }
 
 BLUETOOTH_NAMES = (
@@ -99,6 +100,7 @@ BLUETOOTH_NAMES = (
 	"BrailleConnect",
 	"Pronto!",
 	"VarioUltra",
+	"Orbit Reader 20",
 )
 
 class BrailleDisplayDriver(braille.BrailleDisplayDriver):
