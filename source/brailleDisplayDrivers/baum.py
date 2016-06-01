@@ -145,6 +145,9 @@ class BrailleDisplayDriver(braille.BrailleDisplayDriver):
 					continue
 				if usbID not in USB_IDS_SER:
 					continue
+			elif hwID == r"USB\VID_0483&PID_5740&REV_0200":
+				# Generic STMicroelectronics Virtual COM Port used by Orbit Reader 20.
+				portType = "USB serial"
 			elif "bluetoothName" in portInfo:
 				# Bluetooth.
 				portType = "bluetooth"
