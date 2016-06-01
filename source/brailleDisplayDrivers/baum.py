@@ -176,9 +176,16 @@ class BrailleDisplayDriver(braille.BrailleDisplayDriver):
 			except EnvironmentError:
 				continue
 			if self.isHid:
-				# Some displays don't support BAUM_PROTOCOL_ONOFF.
+				try:
+					# It's essential to send protocol on for the Orbit Reader 20.
+					self._sendRequest(BAUM_PROTOCOL_ONOFF, True)
+				except EnvironmentError:
+					# Pronto! and VarioUltra don't support BAUM_PROTOCOL_ONOFF.
+					pass
+				# Explicitly request device info.
+				# Even where it's supported, BAUM_PROTOCOL_ONOFF doesn't always return device info.
 				self._sendRequest(BAUM_REQUEST_INFO, 0)
-			else:
+			else: # Serial
 				# If the protocol is already on, sending protocol on won't return anything.
 				# First ensure it's off.
 				self._sendRequest(BAUM_PROTOCOL_ONOFF, False)
